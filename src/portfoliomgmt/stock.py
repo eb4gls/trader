@@ -1,5 +1,6 @@
 import pandas as pd
 
+from .stockpackage import StockPackage
 from .tstrategy import TStrategy
 
 
@@ -8,7 +9,7 @@ class Stock:
     _name: str
     _operations: pd.Series
 
-    def __init__(self, name, stock_package=None):
+    def __init__(self, name: str, stock_package: StockPackage = None):
         self._name = name
         if stock_package is None:
             self._operations = pd.Series(dtype='object', name=self._name)
@@ -39,13 +40,13 @@ class Stock:
 
         return total_shares
 
-    def sell(self, num, sell_price_share, strategy=TStrategy.fifo, simulation=False):
+    def sell(self, num, sell_price_share, strategy=TStrategy.FIFO, simulation=False):
         total_profit: float = 0.
 
         if self.get_num_active_operations() < num:
             raise Exception("There aren't enough stocks of "+self._name+" to sell, currently there are "+str(self.get_num_active_operations()))
 
-        if strategy is TStrategy.fifo:
+        if strategy is TStrategy.FIFO:
             step = 1
         else:
             step = -1
@@ -59,7 +60,7 @@ class Stock:
                 if num == 0:
                     return total_profit
 
-    def sell_all(self, sell_price_share, strategy=TStrategy.fifo, simulation=False):
+    def sell_all(self, sell_price_share, strategy=TStrategy.FIFO, simulation=False):
         return self.sell(self.get_num_active_operations(), sell_price_share, strategy, simulation)
 
     def get_num_active_operations(self):
@@ -70,6 +71,7 @@ class Stock:
                 actives += value.num
 
         return actives
+        #  return self._operations[!self._operations.value.closed].count()
 
     def __str__(self):
         out: str = self._name+"\n"
@@ -80,4 +82,6 @@ class Stock:
         return out
 
     def save_to(self):
-        return self._operations.to_json(orient="split")
+        #  a = pd.read_json(x, typ='series', orient='records')
+        return self._operations.to_json(orient="split", default_handler=StockPackage.to_json)
+        #  return self._operations.to_json(orient="records")

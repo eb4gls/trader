@@ -1,10 +1,10 @@
 import enum
 
 
-class TOperation(enum.Enum):
+class TOperation(str, enum.Enum):
 
-    bear = 'bear'
-    bull = 'bull'
+    BEAR = "BEAR"
+    BULL = "BULL"
 
     def __str__(self):
         return self.value

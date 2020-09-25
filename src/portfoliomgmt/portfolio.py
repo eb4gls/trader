@@ -29,6 +29,9 @@ class Portfolio:
 
         return out
 
+    def save_to(self):
+        return self._stocks.to_json(orient="split")
+
     def save(self):
         for value in self._stocks:
-            print(value.save()+"\n")
+            print(value.save_to()+"\n")

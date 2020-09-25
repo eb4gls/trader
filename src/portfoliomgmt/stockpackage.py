@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from .toperation import TOperation
+from ..portfoliomgmt.toperation import TOperation
+
+import json
 
 
 class StockPackage(object):
@@ -9,29 +11,29 @@ class StockPackage(object):
     _num: int = 0  # num of shares, decremented in sell operations
     _original_num: int = 0  # num of shares, it stay immutable for historical purpose
     # _total_price: float = 0.
-    _mode: TOperation
+    _mode: TOperation = TOperation.BULL
     _closed: bool = False
     # _current_price: float = 0.
     _profit: float = 0.  # Accumulated profit  by all shares in the package
 
-    def __init__(self, date, price, num, mode=TOperation.bull):
+    def __init__(self, date, price, num, mode: TOperation = TOperation.BULL, closed=False, profit=0, original_num=0):
         self._buy_date = date
         self._buy_price = price
         self._num = num
-        self._original_num = num
+
         self._mode = mode
-        self._closed = False
-        # self._current_price = 0
-        self._profit = 0
+        self._closed = closed
+        self._profit = profit
+        self._original_num = original_num
 
     def __str__(self):
         return "buy date: " + str(self._buy_date) + ", share price: " + "{:.4f}".format(self._buy_price) + ", number of shares: " + str(self._num) + ", total: " + "{:.4f}".format((self._buy_price * self._num)) + ", " + str(self._mode) + ", closed: " + str(self._closed)
 
-    @property  # when you do Stock.closed, it will call this function
+    @property  # when you do Stock.buy_date, it will call this function
     def buy_date(self):
         return self._buy_date
 
-    @property  # when you do Stock.closed, it will call this function
+    @property  # when you do Stock.buy_price, it will call this function
     def buy_price(self):
         return self._buy_price
 
@@ -39,11 +41,11 @@ class StockPackage(object):
     def num(self):
         return self._num
 
-    @property  # when you do Stock.num, it will call this function
+    @property  # when you do Stock.original_num, it will call this function
     def original_num(self):
         return self._original_num
 
-    @property  # when you do Stock.num, it will call this function
+    @property  # when you do Stock.mode, it will call this function
     def mode(self):
         return self._mode
 
@@ -51,23 +53,43 @@ class StockPackage(object):
     def closed(self):
         return self._closed
 
-    @property  # when you do Stock.closed, it will call this function
+    @property  # when you do Stock.profit, it will call this function
     def profit(self):
-        return self.profit
+        return self._profit
 
-    @num.setter
-    def num(self, num):
-        if num <= 0:
-            raise Exception("Number of shares must be a positive integer")
-
-        self._num = num
+    @buy_date.setter  # when you do Stock.buy_date, it will call this function
+    def buy_date(self, date):
+        self._buy_date = date
 
     @buy_price.setter
     def buy_price(self, buy_price):
         if buy_price <= 0:
             raise Exception("Buy Price must be a positive number")
-
         self._buy_price = buy_price
+
+    @num.setter
+    def num(self, num):
+        if num <= 0:
+            raise Exception("Number of shares must be a positive integer")
+        self._num = num
+
+    @original_num.setter
+    def original_num(self, original_num):
+        if original_num <= 0:
+            raise Exception("Original number of shares must be a positive integer")
+        self._original_num = original_num
+
+    @mode.setter
+    def mode(self, mode):
+        self._mode = mode
+
+    @closed.setter
+    def closed(self, closed):
+        self._closed = closed
+
+    @profit.setter
+    def profit(self, profit):
+        self._profit = profit
 
     def sell(self, num_shares, sell_price_share, simulation):
         sold_shares: int
@@ -83,7 +105,7 @@ class StockPackage(object):
             if not simulation:
                 self._num -= num_shares  # num shares are sold
 
-        if self._mode is TOperation.bull:
+        if self._mode is TOperation.BULL:
             sell_profit += (sold_shares * sell_price_share) - (sold_shares * self._buy_price)
         else:
             sell_profit += (sold_shares * self._buy_price) - (sold_shares * sell_price_share)
@@ -92,3 +114,19 @@ class StockPackage(object):
             self._profit += sell_profit
 
         return sold_shares, sell_profit
+
+    #  def to_json(self):
+        #  return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        #  return json.dumps(self, sort_keys=True, indent=4)
+    # return json.dumps(self.__dict__)
+
+    @classmethod
+    def to_json(cls, st):
+        return json.dumps(st.__dict__)
+
+    @classmethod
+    def from_json(cls, json_str):
+        json_dict = json.loads(json_str)
+        print(json_dict)
+        # return cls(**json_dict)
+        return StockPackage(json_dict["_buy_date"], json_dict["_buy_price"], json_dict["_num"], json_dict["_mode"], json_dict["_closed"], json_dict["_profit"], json_dict["_original_num"])

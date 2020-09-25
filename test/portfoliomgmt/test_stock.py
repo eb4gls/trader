@@ -1,7 +1,8 @@
 from unittest import TestCase
 
-from src.portfoliomgmt import Stock
-from src.portfoliomgmt import StockPackage
+#  from src.portfoliomgmt import Stock
+from stock import Stock
+from src.portfoliomgmt.stockpackage import StockPackage
 from src.portfoliomgmt.toperation import TOperation
 from src.portfoliomgmt.tstrategy import TStrategy
 
@@ -14,9 +15,20 @@ class TestStock(TestCase):
         self.assertIsNot(stock, None)
         print(stock)
 
+    def test_save_stock(self):
+        # Create a empty stock
+        stock_package = StockPackage("2020-07-28", 28.5, 4, TOperation.BEAR)
+        stock = Stock("IBEX", stock_package)
+
+        #  print(stock_package.to_json())
+
+        #  print(StockPackage.from_json(stock_package.to_json()))
+
+        print(stock.save_to())
+
     def test_create_add_stock(self):
         # Create a stock  from a stockPackage
-        stock_package = StockPackage("2020-07-28", 28.5, 4, TOperation.bear)
+        stock_package = StockPackage("2020-07-28", 28.5, 4, TOperation.BEAR)
         stock = Stock("IBEX", stock_package)
         self.assertIsNotNone(stock)
         self.assertTrue(stock.get_total_packages() == 1)
@@ -24,14 +36,14 @@ class TestStock(TestCase):
         print(stock)
 
         # add another stockPackage over the existing Stock
-        stock_package = StockPackage("2020-07-29", 30, 2, TOperation.bear)
+        stock_package = StockPackage("2020-07-29", 30, 2, TOperation.BEAR)
         stock.add(stock_package)
         self.assertTrue(stock.get_total_packages() == 2)
         self.assertTrue(stock.get_total_shares() == 6)
         print(stock)
 
         # add another stockPackage over the existing Stock
-        stock_package = StockPackage("2020-07-30", 32, 6, TOperation.bear)
+        stock_package = StockPackage("2020-07-30", 32, 6, TOperation.BEAR)
         stock.add(stock_package)
         self.assertTrue(stock.get_total_packages() == 3)
         self.assertTrue(stock.get_total_shares() == 12)
@@ -59,4 +71,3 @@ class TestStock(TestCase):
         self.assertTrue(stock.get_active_packages() == 2)
         self.assertTrue(stock.get_total_shares() == 7)
         print(stock)
-        stock.save_to()

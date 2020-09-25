@@ -18,7 +18,7 @@ class TestPortfolio(TestCase):
         self.assertIsNot(portfolio, None)
         print(portfolio)
 
-        stock_package = StockPackage("2020-07-28", 28.5, 4, TOperation.bear)
+        stock_package = StockPackage("2020-07-28", 28.5, 4, TOperation.BEAR)
         portfolio.add("IBEX", stock_package)
         stock = portfolio.getstock("IBEX")
         print(portfolio)
@@ -27,7 +27,7 @@ class TestPortfolio(TestCase):
         self.assertTrue(stock.get_total_packages() == 1)
         self.assertTrue(stock.get_total_shares() == 4)
 
-        stock_package = StockPackage("2020-07-29", 29, 1, TOperation.bear)
+        stock_package = StockPackage("2020-07-29", 29, 1, TOperation.BEAR)
         portfolio.add("IBEX", stock_package)
         print(portfolio)
 
@@ -35,7 +35,7 @@ class TestPortfolio(TestCase):
         self.assertTrue(stock.get_total_packages() == 2)
         self.assertTrue(stock.get_total_shares() == 5)
 
-        stock_package = StockPackage("2020-07-29", 50.5, 2, TOperation.bear)
+        stock_package = StockPackage("2020-07-29", 50.5, 2, TOperation.BEAR)
         portfolio.add("DAX", stock_package)
         stock = portfolio.getstock("DAX")
         print(portfolio)
@@ -60,4 +60,4 @@ class TestPortfolio(TestCase):
         self.assertTrue(stock.get_active_packages() == 0)
         self.assertTrue(stock.get_total_shares() == 0)
 
-        portfolio.save()
+        portfolio.save_to()
